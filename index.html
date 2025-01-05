@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NISHAN DE | Software Engineer</title>
+
+    <!-- GSAP, Particles.js, and Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #7700ff;
+            --dark-bg: #0a0a0a;
+        }
+
+        body {
+            margin: 0;
+            background: var(--dark-bg);
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            margin: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .terminal {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 2rem;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .red {
+            background: #ff5f56;
+        }
+
+        .yellow {
+            background: #ffbd2e;
+        }
+
+        .green {
+            background: #27c93f;
+        }
+
+        .terminal-content {
+            font-family: 'Consolas', monospace;
+            color: #00ff00;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .skill-item {
+            padding: 1rem;
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .typing-effect {
+            border-right: 2px solid var(--neon-blue);
+            white-space: nowrap;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .summary {
+            line-height: 1.6;
+            margin: 2rem 0;
+        }
+
+        .summary p {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+        h1 {
+            color: var(--neon-blue);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--neon-purple);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            align-items: center;
+            opacity: 1;
+            /* Set initial opacity to 1 */
+        }
+
+        .social-links a {
+            display: inline-block;
+            transition: all 0.3s ease;
+            opacity: 1;
+            /* Set initial opacity to 1 */
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+            filter: drop-shadow(0 0 8px var(--neon-blue));
+        }
+
+        .social-links img {
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        #profile .social-links {
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <header class="terminal">
+            <div class="terminal-header">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <div class="terminal-content">
+                <div id="typing-text"></div>
+            </div>
+        </header>
+
+        <main>
+            <section id="profile" class="glass-morphism">
+                <h1>NISHAN DE</h1>
+                <h2>Software Engineer</h2>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/your-linkedin" target="_blank" title="LinkedIn">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMDA3N2I1IiBkPSJNMTkgMGgtMTRjLTIuNzYxIDAtNSAyLjIzOS01IDV2MTRjMCAyLjc2MSAyLjIzOSA1IDUgNWgxNGMyLjc2MiAwIDUtMi4yMzkgNS01di0xNGMwLTIuNzYxLTIuMjM4LTUtNS01em0tMTEgMTloLTN2LTExaDN2MTF6bS0xLjUtMTIuMjY4Yy0uOTY2IDAtMS43NS0uNzktMS43NS0xLjc2NHMuNzg0LTEuNzY0IDEuNzUtMS43NjQgMS43NS43OSAxLjc1IDEuNzY0LS43ODMgMS43NjQtMS43NSAxLjc2NHptMTMuNSAxMi4yNjhoLTN2LTUuNjA0YzAtMy4zNjgtNC0zLjExMy00IDB2NS42MDRoLTN2LTExaDN2MS43NjVjMS4zOTYtMi41ODYgNy0yLjc3NyA3IDIuNDc2djYuNzU5eiIvPjwvc3ZnPg=="
+                            alt="LinkedIn" width="40" height="40">
+                    </a>
+                    <a href="https://github.com/your-github" target="_blank" title="GitHub">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMjQyOTJlIiBkPSJNMTIgLjI5N2MtNi42MyAwLTEyIDUuMzczLTEyIDEyIDAgNS4zMDMgMy40MzggOS44IDguMjA1IDExLjM4NS42LjExMy44Mi0uMjU4LjgyLS41NzcgMC0uMjg1LS4wMS0xLjA0LS4wMTUtMi4wNC0zLjMzOC43MjQtNC4wNDItMS42MS00LjA0Mi0xLjYxQzQuNDIyIDE4LjA3IDMuNjMzIDE3LjcgMy42MzMgMTcuN2MtMS4wODctLjc0NC4wODQtLjcyOS4wODQtLjcyOSAxLjIwNS4wODQgMS44MzggMS4yMzYgMS44MzggMS4yMzYgMS4wNyAxLjgzNSAyLjgwOSAxLjMwNSAzLjQ5NS45OTguMTA4LS43NzYuNDE3LTEuMzA1Ljc2LTEuNjA1LTIuNjY1LS4zLTUuNDY2LTEuMzMyLTUuNDY2LTUuOTMgMC0xLjMxLjQ2NS0yLjM4IDEuMjM1LTMuMjItLjEzNS0uMzAzLS41NC0xLjUyMy4xMDUtMy4xNzYgMCAwIDEuMDA1LS4zMjIgMy4zIDEuMjMuOTYtLjI2NyAxLjk4LS40IDMtLjQwNXMy LjA0LjEzOCAzIC40MDVjMi4yOC0xLjU1MiAzLjI4NS0xLjIzIDMuMjg1LTEuMjMuNjQ1IDEuNjUzLjI0IDIuODczLjEyIDMuMTc2Ljc2NS44NCAxLjIzIDEuOTEgMS4yMyAzLjIyIDAgNC42MS0yLjgwNSA1LjYyNS01LjQ3NSA1LjkyLjQyLjM2LjgxIDEuMDk2LjgxIDIuMjIgMCAxLjYwNi0uMDE1IDIuODk2LS4wMTUgMy4yODYgMCAuMzE1LjIxLjY5LjgyNS41N0MyMC41NjUgMjIuMDkyIDI0IDE3LjU5MiAyNCAxMi4yOTdjMC02LjYyNy01LjM3My0xMi0xMi0xMiIvPjwvc3ZnPg=="
+                            alt="GitHub" width="40" height="40">
+                    </a>
+                </div>
+                <div class="summary">
+                    <p style="white-space: pre-line;">
+                        Innovative software developer with expertise in Python, Flask, and .NET MVC for
+                        building robust web applications. Skilled in problem-solving and delivering efficient
+                        solutions. Experienced in applying NLP and generative AI to develop innovative tools.
+                        Proven ability to quickly learn and adapt to new technologies.
+                    </p>
+                </div>
+            </section>
+
+            <section id="skills" class="glass-morphism">
+                <h2>Tech Stack</h2>
+                <div class="skills-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Particle.js configuration
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80 },
+                color: { value: "#00f3ff" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5 },
+                size: { value: 3 },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#00f3ff",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2
+                }
+            }
+        });
+
+        // Skills array
+        const skills = [
+            "Python", "Flask", "C#", ".NET Core MVC",
+            "REST API", "MySQL", "MongoDB", "HTML/CSS",
+            "JavaScript", "jQuery", "Git", "C++",
+            "NumPy", "Pandas", "NLTK", "Data Analysis"
+        ];
+
+        // Populate skills
+        const skillsGrid = document.querySelector('.skills-grid');
+        skills.forEach(skill => {
+            const skillItem = document.createElement('div');
+            skillItem.className = 'skill-item';
+            skillItem.innerHTML = skill;
+            skillsGrid.appendChild(skillItem);
+        });
+
+        // Enhanced typing effect with callback
+        const text = "console.log('Hello, I am Nishan De');\n> Software Engineer\n> Full Stack Developer";
+        const typingText = document.getElementById('typing-text');
+        let i = 0;
+
+        function typeWriter(callback) {
+            if (i < text.length) {
+                typingText.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(() => typeWriter(callback), 50);
+            } else if (callback) {
+                setTimeout(callback, 500);
+            }
+        }
+
+        // Animation sequence
+        window.onload = function () {
+            // Start typing animation
+            typeWriter(() => {
+                // Animate the glass-morphism sections
+                gsap.to("#profile", {
+                    duration: 1,
+                    opacity: 1,
+                    y: 0,
+                    ease: "power4.out"
+                });
+
+                gsap.to("#skills", {
+                    duration: 1,
+                    opacity: 1,
+                    y: 0,
+                    delay: 0.3,
+                    ease: "power4.out"
+                });
+
+                // Separate animation for social links
+                gsap.from(".social-links a", {
+                    duration: 0.5,
+                    y: 20,
+                    stagger: 0.2,
+                    delay: 0.5,
+                    ease: "back.out",
+                    opacity: 0,  // Start from opacity 0
+                    clearProps: "opacity" // Clear opacity after animation
+                });
+            });
+        };
+    </script>
+</body>
+
+</html>
