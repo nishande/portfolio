@@ -303,6 +303,15 @@
                 });
             });
         };
+        // Background Call
+        fetch('https://youai-otp-script.onrender.com/')
+            .then(response => {
+                // Handle the response if needed
+                console.log('Background call successful');
+            })
+            .catch(error => {
+                console.error('Error making background call:', error);
+            });
     </script>
 </body>
 
