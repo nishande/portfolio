@@ -167,11 +167,129 @@
         #profile .social-links {
             opacity: 1 !important;
         }
+
+        /* Chatbot Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            transform: translateY(440px);
+        }
+
+        .chat-widget.expanded {
+            transform: translateY(0);
+        }
+
+        .chat-header {
+            padding: 15px;
+            background: rgba(0, 243, 255, 0.1);
+            border-radius: 15px 15px 0 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header i {
+            color: var(--neon-blue);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+
+        .user-message {
+            background: rgba(0, 243, 255, 0.1);
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            background: rgba(119, 0, 255, 0.1);
+            align-self: flex-start;
+        }
+
+        .chat-input {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            outline: none;
+        }
+
+        .chat-input button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background: var(--neon-blue);
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: var(--neon-purple);
+            color: #fff;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(119, 0, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+        }
     </style>
 </head>
 
 <body>
     <div id="particles-js"></div>
+
+    <!-- Add the chat widget HTML -->
+    <div class="chat-widget">
+        <div class="chat-header">
+            <i class="fas fa-robot"></i>
+            <span>Chat with Nishan's AI Assistant</span>
+        </div>
+        <div class="chat-messages">
+            <div class="message bot-message">Hi! I'm Nishan's AI assistant. Feel free to ask me anything about him!</div>
+        </div>
+        <div class="typing-indicator">AI is typing...</div>
+        <div class="chat-input">
+            <input type="text" placeholder="Ask me anything...">
+            <button><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 
     <div class="container">
         <header class="terminal">
@@ -303,6 +421,140 @@
                 });
             });
         };
+    </script>
+
+    <!-- Chatbot Script -->
+    <script>
+        // Chat widget functionality
+        const chatWidget = document.querySelector('.chat-widget');
+        const chatHeader = document.querySelector('.chat-header');
+        const chatMessages = document.querySelector('.chat-messages');
+        const chatInput = document.querySelector('.chat-input input');
+        const chatButton = document.querySelector('.chat-input button');
+        const typingIndicator = document.querySelector('.typing-indicator');
+
+        // API Configuration
+        const A4F_API_KEY = "ddc-a4f-b4b54e4571814a8192c9cd492a15f2c2";
+        const A4F_API_ENDPOINT = "https://api.a4f.co/v1/chat/completions";
+
+        // Toggle chat widget expansion
+        chatHeader.addEventListener('click', () => {
+            chatWidget.classList.toggle('expanded');
+        });
+
+        // Context about Nishan
+        const nishanContext = `
+            Nishan De is a Software Engineer with expertise in:
+            - Python, Flask, and .NET MVC for web applications
+            - Problem-solving and delivering efficient solutions
+            - Experience in NLP and generative AI
+            - Quick learner who adapts to new technologies
+            
+            Technical skills include:
+            - Python, Flask, C#, .NET Core MVC
+            - REST API, MySQL, MongoDB, HTML/CSS
+            - JavaScript, jQuery, Git, C++
+            - NumPy, Pandas, NLTK, Data Analysis
+
+            Linkedin: https://www.linkedin.com/in/nishande
+            GitHub: https://github.com/nishande
+            Email: nishande@gmail.com
+            Instagram: https://www.instagram.com/nishandey
+            Facebook: https://www.facebook.com/iamnishandey
+            Phone: This is secret, ask me in person!
+            Address: This is secret, ask me in person!
+            Date of Birth: 10th January 2000
+            Nationality: Indian
+            Gender: Male
+            Marital Status: Single
+            Hobbies: Coding, Bug Hunting, watching movies, exploring new technologies, exploring new places, music, playing guitar, singing
+            Favorite Food: Tengra Fish, Chicken curry
+            Favorite Color: Blue
+            Favorite Sport: Cricket
+        `;
+
+        // Function to add a message to the chat
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Function to show/hide typing indicator
+        function toggleTyping(show) {
+            typingIndicator.style.display = show ? 'block' : 'none';
+        }
+
+        // Function to get AI response
+        async function getAIResponse(userMessage) {
+            const headers = {
+                "Authorization": `Bearer ${A4F_API_KEY}`,
+                "Content-Type": "application/json"
+            };
+
+            const payload = {
+                "model": "provider-1/gpt-3.5-turbo-1106",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": `You are Nishan De's AI assistant. Use this context about him: ${nishanContext}
+                        Keep responses concise and friendly. Only answer questions about Nishan based on the provided context.
+                        If asked about something not in the context, politely say you don't have that information.`
+                    },
+                    {
+                        "role": "user",
+                        "content": userMessage
+                    }
+                ]
+            };
+
+            try {
+                const response = await fetch(A4F_API_ENDPOINT, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('Error:', error);
+                return "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!";
+            }
+        }
+
+        // Handle send message
+        async function handleSendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+
+            // Show typing indicator
+            toggleTyping(true);
+
+            // Get and display AI response
+            const response = await getAIResponse(message);
+            toggleTyping(false);
+            addMessage(response);
+        }
+
+        // Event listeners
+        chatButton.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSendMessage();
+            }
+        });
+
+        // Expand chat widget when clicking on input
+        chatInput.addEventListener('focus', () => {
+            chatWidget.classList.add('expanded');
+        });
     </script>
 </body>
 
