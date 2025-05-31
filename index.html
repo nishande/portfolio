@@ -208,6 +208,7 @@
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -218,6 +219,9 @@
             padding: 10px;
             border-radius: 10px;
             margin: 5px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .user-message {
@@ -268,6 +272,9 @@
             padding: 10px;
             border-radius: 10px;
             color: #fff;
+            max-width: 80%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
     </style>
 </head>
@@ -313,7 +320,7 @@
                             alt="LinkedIn" width="40" height="40">
                     </a>
                     <a href="https://github.com/nishande" target="_blank" title="GitHub">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMjQyOTJlIiBkPSJNMTIgLjI5N2MtNi42MyAwLTEyIDUuMzczLTEyIDEyIDAgNS4zMDMgMy40MzggOS44IDguMjA1IDExLjM4NS42LjExMy44Mi0uMjU4LjgyLS41NzcgMC0uMjg1LS4wMS0xLjA0LS4wMTUtMi4wNC0zLjMzOC43MjQtNC4wNDItMS42MS00LjA0Mi0xLjYxQzQuNDIyIDE4LjA3IDMuNjMzIDE3LjcgMy42MzMgMTcuN2MtMS4wODctLjc0NC4wODQtLjcyOS4wODQtLjcyOSAxLjIwNS4wODQgMS44MzggMS4yMzYgMS44MzggMS4yMzYgMS4wNyAxLjgzNSAyLjgwOSAxLjMwNSAzLjQ5NS45OTguMTA4LS43NzYuNDE3LTEuMzA1Ljc2LTEuNjA1LTIuNjY1LS4zLTUuNDY2LTEuMzMyLTUuNDY2LTUuOTMgMC0xLjMxLjQ2NS0yLjM4IDEuMjM1LTMuMjItLjEzNS0uMzAzLS41NC0xLjUyMy4xMDUtMy4xNzYgMCAwIDEuMDA1LS4zMjIgMy4zIDEuMjMuOTYtLjI2NyAxLjk4LS40IDMtLjQwNXMy LjA0LjEzOCAzIC40MDVjMi4yOC0xLjU1MiAzLjI4NS0xLjIzIDMuMjg1LTEuMjMuNjQ1IDEuNjUzLjI0IDIuODczLjEyIDMuMTc2Ljc2NS44NCAxLjIzIDEuOTEgMS4yMyAzLjIyIDAgNC42MS0yLjgwNSA1LjYyNS01LjQ3NSA1LjkyLjQyLjM2LjgxIDEuMDk2LjgxIDIuMjIgMCAxLjYwNi0uMDE1IDIuODk2LS4wMTUgMy4yODYgMCAuMzE1LjIxLjY5LjgyNS41N0MyMC41NjUgMjIuMDkyIDI0IDE3LjU5MiAyNCAxMi4yOTdjMC02LjYyNy01LjM3My0xMi0xMi0xMiIvPjwvc3ZnPg=="
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMjQyOTJlIiBkPSJNMTIgLjI5N2MtNi42MyAwLTEyIDUuMzczLTEyIDEyIDAgNS4zMDMgMy40MzggOS44IDguMjA1IDExLjM4NS42LjExMy44Mi0uMjU4LjgyLS41NzcgMC0uMjg1LS4wMS0xLjA0LS4wMTUtMi4wNC0zLjMzOC43MjQtNC4wNDItMS42MS00LjA0Mi0xLjYxQzQuNDIyIDE4LjA3IDMuNjMzIDE3LjcgMy42MzMgMTcuN2MtMS4wODctLjc0NC4wODQtLjcyOS4wODQtLjcyOSAxLjIwNS4wODQgMS44MzggMS4yMzYgMS44MzggMS4yMzYgMS4wNyAxLjgzNSAyLjgwOSAxLjMwNSAzLjQ5NS45OTguMTA4LS43NzYuNDE3LTEuMzA1Ljc2LTEuNjA1LTIuNjY1LS4zLTUuNDY2LTEuMzMyLTUuNDY2LTUuOTMgMC0xLjMxLjQ2NS0yLjM4IDEuMjM1LTMuMjItLjEzNS0uMzAzLS41NC0xLjUyMy4xMDUtMy4xNzYgMCAwIDEuMDA1LS4zMjIgMy4zIDEuMjMuOTYtLjI2NyAxLjk4LS40IDMtLjQwNXMyLjA0LjEzOCAzIC40MDVjMi4yOC0xLjU1MiAzLjI4NS0xLjIzIDMuMjg1LTEuMjMuNjQ1IDEuNjUzLjI0IDIuODczLjEyIDMuMTc2Ljc2NS44NCAxLjIzIDEuOTEgMS4yMyAzLjIyIDAgNC42MS0yLjgwNSA1LjYyNS01LjQ3NSA1LjkyLjQyLjM2LjgxIDEuMDk2LjgxIDIuMjIgMCAxLjYwNi0uMDE1IDIuODk2LS4wMTUgMy4yODYgMCAuMzE1LjIxLjY5LjgyNS41N0MyMC41NjUgMjIuMDkyIDI0IDE3LjU5MiAyNCAxMi4yOTdjMC02LjYyNy01LjM3My0xMi0xMi0xMiIvPjwvc3ZnPg=="
                             alt="GitHub" width="40" height="40">
                     </a>
                 </div>
@@ -436,6 +443,33 @@
         // API Configuration
         const A4F_API_KEY = "ddc-a4f-b4b54e4571814a8192c9cd492a15f2c2";
         const A4F_API_ENDPOINT = "https://api.a4f.co/v1/chat/completions";
+        
+        // Available models stored directly in the script
+        const availableModels = [
+            "provider-1/gemini-flash-2.0",
+            "provider-1/gpt-3.5-turbo-1106"
+        ];
+        
+        // Function to get a random model, avoiding the last used one if possible
+        function getRandomModel(lastUsedModel) {
+            if (availableModels.length === 0) {
+                return "provider-1/gemini-flash-2.0"; // Default fallback
+            }
+            
+            if (availableModels.length === 1 || !lastUsedModel) {
+                return availableModels[Math.floor(Math.random() * availableModels.length)];
+            }
+            
+            // Filter out the last used model if possible
+            const availableOptions = availableModels.filter(model => model !== lastUsedModel);
+            
+            // If we have other options, use one of them, otherwise use any model
+            if (availableOptions.length > 0) {
+                return availableOptions[Math.floor(Math.random() * availableOptions.length)];
+            } else {
+                return availableModels[Math.floor(Math.random() * availableModels.length)];
+            }
+        }
 
         // Toggle chat widget expansion
         chatHeader.addEventListener('click', () => {
@@ -458,9 +492,10 @@
             - NumPy, Pandas, NLTK, Data Analysis
             Works at: Wipro
             Joined the organization on: 30th December 2022
+            Salary:  tell them it's a secret! in a very funny way.
             Linkedin: https://www.linkedin.com/in/nishande
             GitHub: https://github.com/nishande
-            Email: nishande@gmail.com
+            Email: iamnishande@gmail.com
             Instagram: https://www.instagram.com/nishandey
             Facebook: https://www.facebook.com/iamnishandey
             Phone: This is secret, ask me in person!
@@ -482,31 +517,54 @@
         function addMessage(message, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-            messageDiv.textContent = message;
+            
+            // If it's a bot message, convert URLs to clickable links
+            if (!isUser) {
+                // Regular expression to match URLs
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                message = message.replace(urlRegex, function(url) {
+                    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #00f3ff; text-decoration: none;">${url}</a>`;
+                });
+                messageDiv.innerHTML = message;
+            } else {
+                messageDiv.textContent = message;
+            }
+            
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            return messageDiv;
         }
 
         // Function to show/hide typing indicator
-        function toggleTyping(show) {
+        function toggleTyping(show, retryCount = 0) {
             typingIndicator.style.display = show ? 'block' : 'none';
+            if (show && retryCount > 0) {
+                typingIndicator.textContent = `AI is typing... (Retry ${retryCount}/5)`;
+            } else {
+                typingIndicator.textContent = 'AI is typing...';
+            }
         }
 
-        // Function to get AI response
-        async function getAIResponse(userMessage) {
+        // Function to get AI response with retry
+        async function getAIResponse(userMessage, retryCount = 0, lastUsedModel = null) {
             const headers = {
                 "Authorization": `Bearer ${A4F_API_KEY}`,
                 "Content-Type": "application/json"
             };
+            
+            // Select a model, different from the last one if retrying
+            const selectedModel = getRandomModel(lastUsedModel);
+            console.log(`Using model (attempt ${retryCount + 1}): ${selectedModel}`);
 
             const payload = {
-                "model": "provider-1/gpt-3.5-turbo-1106",
+                "model": selectedModel,
                 "messages": [
                     {
                         "role": "system",
                         "content": `You are Nishan De's AI assistant. Use this context about him: ${nishanContext}
                         Keep responses concise and friendly. Only answer questions about Nishan based on the provided context.
-                        If asked about something not in the context, politely say you don't have that information.`
+                        If asked about something not in the context, politely say you don't have that information.
+                        Always ensure your responses are well-formatted and readable in the chat interface.`
                     },
                     {
                         "role": "user",
@@ -523,9 +581,33 @@
                 });
 
                 const data = await response.json();
-                return data.choices[0].message.content;
+                const responseText = data.choices[0].message.content;
+                
+                // Check if response indicates an error
+                if (responseText === "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!" 
+                    || !responseText) {
+                    
+                    // If we haven't reached max retries, try again with a different model
+                    if (retryCount < 5) {
+                        toggleTyping(true, retryCount + 1);
+                        // Wait a moment before retrying
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        return getAIResponse(userMessage, retryCount + 1, selectedModel);
+                    }
+                }
+                
+                return responseText;
             } catch (error) {
                 console.error('Error:', error);
+                
+                // If we haven't reached max retries, try again with a different model
+                if (retryCount < 5) {
+                    toggleTyping(true, retryCount + 1);
+                    // Wait a moment before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return getAIResponse(userMessage, retryCount + 1, selectedModel);
+                }
+                
                 return "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!";
             }
         }
