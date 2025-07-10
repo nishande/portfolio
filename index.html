@@ -185,6 +185,31 @@
             transition: transform 0.3s ease;
             transform: translateY(440px);
         }
+        
+        /* Markdown styles for chat */
+        .bot-message strong {
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+        
+        .bot-message em {
+            font-style: italic;
+            color: var(--neon-purple);
+        }
+        
+        .bot-message ul {
+            padding-left: 20px;
+            margin: 5px 0;
+        }
+        
+        .bot-message li {
+            margin: 2px 0;
+        }
+        
+        .bot-message h1, .bot-message h2, .bot-message h3 {
+            margin: 5px 0;
+            color: var(--neon-blue);
+        }
 
         .chat-widget.expanded {
             transform: translateY(0);
@@ -289,7 +314,7 @@
             <span>Chat with Nishan's AI Assistant</span>
         </div>
         <div class="chat-messages">
-            <div class="message bot-message">Hi! I'm Nishan's AI assistant. Feel free to ask me anything about him!</div>
+            <div class="message bot-message">Hi! I'm <strong>Nishan's AI assistant</strong>. Feel free to ask me anything about him!</div>
         </div>
         <div class="typing-indicator">AI is typing...</div>
         <div class="chat-input">
@@ -520,8 +545,11 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             
-            // If it's a bot message, convert URLs to clickable links
+            // If it's a bot message, process markdown and convert URLs to clickable links
             if (!isUser) {
+                // Process markdown
+                message = processMarkdown(message);
+                
                 // Regular expression to match URLs
                 const urlRegex = /(https?:\/\/[^\s]+)/g;
                 message = message.replace(urlRegex, function(url) {
@@ -535,6 +563,29 @@
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
             return messageDiv;
+        }
+        
+        // Function to process markdown in text
+        function processMarkdown(text) {
+            // Bold: **text** or __text__
+            text = text.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+            
+            // Italic: *text* or _text_
+            text = text.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
+            
+            // Lists: - item or * item
+            text = text.replace(/^([-*]) (.*?)$/gm, '<li>$2</li>');
+            text = text.replace(/<li>(.*?)<\/li>(\n<li>.*?<\/li>)+/g, '<ul>$&</ul>');
+            
+            // Headers: # Header
+            text = text.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+            text = text.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+            text = text.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+            
+            // Line breaks
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
         }
 
         // Function to show/hide typing indicator
@@ -558,7 +609,7 @@
             const selectedModel = getRandomModel(lastUsedModel);
             console.log(`Using model (attempt ${retryCount + 1}): ${selectedModel}`);
 
-            const payload = {
+                            const payload = {
                 "model": selectedModel,
                 "messages": [
                     {
@@ -566,7 +617,12 @@
                         "content": `You are Nishan De's AI assistant. Use this context about him: ${nishanContext}
                         Keep responses concise and friendly. Only answer questions about Nishan based on the provided context.
                         If asked about something not in the context, politely say you don't have that information.
-                        Always ensure your responses are well-formatted and readable in the chat interface.`
+                        Always ensure your responses are well-formatted and readable in the chat interface.
+                        Use markdown formatting in your responses:
+                        - Use **bold** for emphasis and important information
+                        - Use *italic* for secondary emphasis
+                        - Use proper lists with - or * for bullet points
+                        - Use # for headers when organizing information`
                     },
                     {
                         "role": "user",
