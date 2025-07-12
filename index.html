@@ -478,7 +478,7 @@
         // Function to get a random model, avoiding the last used one if possible
         function getRandomModel(lastUsedModel) {
             if (availableModels.length === 0) {
-                return "provider-1/gemini-flash-2.0"; // Default fallback
+                return "provider-1//gemini-2.0-flash"; // Default fallback
             }
             
             if (availableModels.length === 1 || !lastUsedModel) {
@@ -503,7 +503,7 @@
 
         // Context about Nishan
         const nishanContext = `
-            Current Date and Time: ${new Date().toLocaleString()}
+            Current Date and Time: ${(() => { const d = new Date(); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`; })()}
             Nishan De is a Software Engineer with expertise in:
             - Python, Flask, and .NET MVC for web applications
             - Problem-solving and delivering efficient solutions
