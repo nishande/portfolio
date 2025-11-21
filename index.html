@@ -1012,6 +1012,9 @@
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
 
+        // Conversation History - stores up to 6 messages (user + assistant pairs)
+        let conversationHistory = [];
+
         // API Configuration
         const A4F_API_KEY = "ddc-a4f-b4b54e4571814a8192c9cd492a15f2c2";
         const A4F_API_ENDPOINT = "https://api.a4f.co/v1/chat/completions";
@@ -1187,26 +1190,34 @@
             const selectedModel = getRandomModel(lastUsedModel);
             console.log(`Using model (attempt ${retryCount + 1}): ${selectedModel}`);
 
+            // Build messages array with system message, conversation history, and current user message
+            const messages = [
+                {
+                    "role": "system",
+                    "content": `You are Nishan De's AI assistant. Use this context about him: ${nishanContext}
+                    Keep responses concise and friendly. Only answer questions about Nishan based on the provided context.
+                    If asked about something not in the context, politely say you don't have that information.
+                    Always ensure your responses are well-formatted and readable in the chat interface. Don't end the response with any question. Don't use the word "provided context". Always show the positive side of Nishan, and avoid the negatives.
+                    Do not provide career advice, "next steps", "practical steps", or suggestions for resume improvements.
+                    
+                    Use markdown formatting in your responses:
+                    - Use **bold** for emphasis and important information
+                    - Use *italic* for secondary emphasis`
+                }
+            ];
+
+            // Add conversation history (up to 6 messages)
+            messages.push(...conversationHistory);
+
+            // Add current user message
+            messages.push({
+                "role": "user",
+                "content": userMessage
+            });
+
             const payload = {
                 "model": selectedModel,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": `You are Nishan De's AI assistant. Use this context about him: ${nishanContext}
-                        Keep responses concise and friendly. Only answer questions about Nishan based on the provided context.
-                        If asked about something not in the context, politely say you don't have that information.
-                        Always ensure your responses are well-formatted and readable in the chat interface. Don't end the response with any question. Don't use the word "provided context". Always show the positive side of Nishan, and avoid the negatives.
-                        Do not provide career advice, "next steps", "practical steps", or suggestions for resume improvements.
-                        
-                        Use markdown formatting in your responses:
-                        - Use **bold** for emphasis and important information
-                        - Use *italic* for secondary emphasis`
-                    },
-                    {
-                        "role": "user",
-                        "content": userMessage
-                    }
-                ]
+                "messages": messages
             };
 
             try {
@@ -1248,9 +1259,15 @@
             chatInput.disabled = true;
             sendButton.disabled = true;
 
-            // Add user message
+            // Add user message to UI
             addMessage(message, true);
             chatInput.value = '';
+
+            // Add user message to conversation history
+            conversationHistory.push({
+                "role": "user",
+                "content": message
+            });
 
             // Show typing indicator
             toggleTyping(true);
@@ -1259,6 +1276,17 @@
             const response = await getAIResponse(message);
             toggleTyping(false);
             addMessage(response);
+
+            // Add assistant response to conversation history
+            conversationHistory.push({
+                "role": "assistant",
+                "content": response
+            });
+
+            // Keep only the last 6 messages in history
+            if (conversationHistory.length > 6) {
+                conversationHistory = conversationHistory.slice(-6);
+            }
 
             // Re-enable input
             chatInput.disabled = false;
