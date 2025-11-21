@@ -1250,10 +1250,7 @@
             chatBubble.addEventListener('click', () => {
                 chatOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                // Focus input when opened
-                setTimeout(() => {
-                    chatInputMobile.focus();
-                }, 300);
+                // Don't auto-focus - let user tap input field to open keyboard
             });
         }
 
@@ -1458,6 +1455,13 @@
                 otherMessages.appendChild(otherMessageWrapper);
                 otherMessages.scrollTop = otherMessages.scrollHeight;
             }
+
+            // On mobile, blur input when bot message arrives to prevent keyboard from opening
+            if (!isUser && isMobileView()) {
+                if (document.activeElement === chatInputMobile || document.activeElement === chatInput) {
+                    document.activeElement.blur();
+                }
+            }
         }
 
         // Process markdown
@@ -1629,7 +1633,7 @@
             if (otherButton) {
                 otherButton.disabled = false;
             }
-            input.focus();
+            // Don't auto-focus - let user tap input field to open keyboard on mobile
         }
 
         // Event listeners
