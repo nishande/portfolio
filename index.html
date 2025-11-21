@@ -1464,6 +1464,129 @@
             }
         }
 
+        // Create a streaming message bubble that can be updated incrementally
+        let streamingMessageElements = { desktop: null, mobile: null };
+
+        function createStreamingMessage() {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = 'message-wrapper bot';
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar bot';
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = ''; // Start empty
+
+            messageContent.appendChild(avatar);
+            messageContent.appendChild(bubble);
+            messageWrapper.appendChild(messageContent);
+
+            return messageWrapper;
+        }
+
+        function initializeStreamingMessage() {
+            // Clear any existing streaming messages
+            if (streamingMessageElements.desktop) {
+                streamingMessageElements.desktop.remove();
+            }
+            if (streamingMessageElements.mobile) {
+                streamingMessageElements.mobile.remove();
+            }
+
+            // Don't create the message bubble yet - wait for first chunk
+            streamingMessageElements.desktop = null;
+            streamingMessageElements.mobile = null;
+        }
+
+        function ensureStreamingMessageExists() {
+            // Create streaming messages only if they don't exist yet
+            if (!streamingMessageElements.desktop) {
+                const desktopWrapper = createStreamingMessage();
+                chatMessages.appendChild(desktopWrapper);
+                streamingMessageElements.desktop = desktopWrapper;
+            }
+
+            if (!streamingMessageElements.mobile) {
+                const mobileWrapper = createStreamingMessage();
+                chatMessagesMobile.appendChild(mobileWrapper);
+                streamingMessageElements.mobile = mobileWrapper;
+            }
+        }
+
+        function updateStreamingMessage(content) {
+            // Ensure message bubbles exist before updating
+            ensureStreamingMessageExists();
+
+            // Process markdown and URLs for display
+            const processedContent = processMarkdown(content);
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const finalContent = processedContent.replace(urlRegex, url => {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            });
+
+            // Update both desktop and mobile messages
+            if (streamingMessageElements.desktop) {
+                const bubble = streamingMessageElements.desktop.querySelector('.message-bubble');
+                if (bubble) {
+                    bubble.innerHTML = finalContent;
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            if (streamingMessageElements.mobile) {
+                const bubble = streamingMessageElements.mobile.querySelector('.message-bubble');
+                if (bubble) {
+                    bubble.innerHTML = finalContent;
+                }
+                chatMessagesMobile.scrollTop = chatMessagesMobile.scrollHeight;
+            }
+        }
+
+        function finalizeStreamingMessage(finalContent) {
+            // Ensure message bubbles exist (in case stream completed without chunks)
+            ensureStreamingMessageExists();
+
+            // Process markdown and URLs for final display
+            const processedContent = processMarkdown(finalContent);
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const finalProcessed = processedContent.replace(urlRegex, url => {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            });
+
+            // Update both desktop and mobile messages
+            if (streamingMessageElements.desktop) {
+                const bubble = streamingMessageElements.desktop.querySelector('.message-bubble');
+                if (bubble) {
+                    bubble.innerHTML = finalProcessed;
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            if (streamingMessageElements.mobile) {
+                const bubble = streamingMessageElements.mobile.querySelector('.message-bubble');
+                if (bubble) {
+                    bubble.innerHTML = finalProcessed;
+                }
+                chatMessagesMobile.scrollTop = chatMessagesMobile.scrollHeight;
+            }
+
+            // Clear streaming message references
+            streamingMessageElements.desktop = null;
+            streamingMessageElements.mobile = null;
+
+            // On mobile, blur input when bot message completes to prevent keyboard from opening
+            if (isMobileView()) {
+                if (document.activeElement === chatInputMobile || document.activeElement === chatInput) {
+                    document.activeElement.blur();
+                }
+            }
+        }
+
         // Process markdown
         function processMarkdown(text) {
             // Bold: **text** or __text__
@@ -1499,8 +1622,8 @@
             }
         }
 
-        // Get AI response
-        async function getAIResponse(userMessage, retryCount = 0, lastUsedModel = null) {
+        // Stream AI response
+        async function streamAIResponse(userMessage, onChunk, onComplete, onError, retryCount = 0, lastUsedModel = null) {
             const headers = {
                 "Authorization": `Bearer ${A4F_API_KEY}`,
                 "Content-Type": "application/json"
@@ -1536,7 +1659,8 @@
 
             const payload = {
                 "model": selectedModel,
-                "messages": messages
+                "messages": messages,
+                "stream": true // Enable streaming
             };
 
             try {
@@ -1546,24 +1670,70 @@
                     body: JSON.stringify(payload)
                 });
 
-                const data = await response.json();
-                const responseText = data.choices[0].message.content;
-
-                if (!responseText && retryCount < 5) {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    return getAIResponse(userMessage, retryCount + 1, selectedModel);
+                if (!response.ok) {
+                    throw new Error("API request failed with status " + response.status);
                 }
 
-                return responseText || "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!";
+                if (!response.body) {
+                    throw new Error("Response body is null");
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = "";
+                let fullResponse = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        break;
+                    }
+
+                    buffer += decoder.decode(value, { stream: true });
+                    
+                    let boundary;
+                    while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+                        const chunkLine = buffer.substring(0, boundary);
+                        buffer = buffer.substring(boundary + 2);
+
+                        if (chunkLine.startsWith("data: ")) {
+                            const jsonDataStr = chunkLine.substring(6);
+                            if (jsonDataStr.trim() === "[DONE]") {
+                                continue;
+                            }
+                            try {
+                                const jsonData = JSON.parse(jsonDataStr);
+                                const content = jsonData.choices?.[0]?.delta?.content;
+                                if (content) {
+                                    fullResponse += content;
+                                    onChunk(content, fullResponse);
+                                }
+                            } catch (e) {
+                                console.error("Error parsing JSON chunk:", e, jsonDataStr);
+                            }
+                        }
+                    }
+                }
+
+                if (!fullResponse && retryCount < 5) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return streamAIResponse(userMessage, onChunk, onComplete, onError, retryCount + 1, selectedModel);
+                }
+
+                const finalResponse = fullResponse || "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!";
+                onComplete(finalResponse);
+                return finalResponse;
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Streaming error:', error);
 
                 if (retryCount < 5) {
                     await new Promise(resolve => setTimeout(resolve, 1000));
-                    return getAIResponse(userMessage, retryCount + 1, selectedModel);
+                    return streamAIResponse(userMessage, onChunk, onComplete, onError, retryCount + 1, selectedModel);
                 }
 
-                return "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!";
+                const errorMessage = "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!";
+                onError(errorMessage);
+                return errorMessage;
             }
         }
 
@@ -1605,35 +1775,81 @@
                 "content": message
             });
 
-            // Show typing indicator
+            // Show typing indicator while waiting for response
             toggleTyping(true);
 
-            // Get and display AI response
-            const response = await getAIResponse(message);
-            toggleTyping(false);
-            addMessage(response);
+            // Initialize streaming message (clears any previous streaming messages)
+            initializeStreamingMessage();
 
-            // Add assistant response to conversation history
-            conversationHistory.push({
-                "role": "assistant",
-                "content": response
-            });
+            // Track if this is the first chunk
+            let isFirstChunk = true;
 
-            // Keep only the last 6 messages in history
-            if (conversationHistory.length > 6) {
-                conversationHistory = conversationHistory.slice(-6);
-            }
+            // Stream AI response
+            await streamAIResponse(
+                message,
+                // onChunk - called for each chunk of the stream
+                (chunk, fullContent) => {
+                    // Hide typing indicator when first chunk arrives
+                    if (isFirstChunk) {
+                        toggleTyping(false);
+                        isFirstChunk = false;
+                    }
+                    updateStreamingMessage(fullContent);
+                },
+                // onComplete - called when streaming is complete
+                (fullResponse) => {
+                    // Hide typing indicator if it's still showing (in case no chunks were received)
+                    if (isFirstChunk) {
+                        toggleTyping(false);
+                    }
+                    finalizeStreamingMessage(fullResponse);
+                    
+                    // Add assistant response to conversation history
+                    conversationHistory.push({
+                        "role": "assistant",
+                        "content": fullResponse
+                    });
 
-            // Re-enable input
-            input.disabled = false;
-            button.disabled = false;
-            if (otherInput) {
-                otherInput.disabled = false;
-            }
-            if (otherButton) {
-                otherButton.disabled = false;
-            }
-            // Don't auto-focus - let user tap input field to open keyboard on mobile
+                    // Keep only the last 6 messages in history
+                    if (conversationHistory.length > 6) {
+                        conversationHistory = conversationHistory.slice(-6);
+                    }
+
+                    // Re-enable input
+                    input.disabled = false;
+                    button.disabled = false;
+                    if (otherInput) {
+                        otherInput.disabled = false;
+                    }
+                    if (otherButton) {
+                        otherButton.disabled = false;
+                    }
+                },
+                // onError - called if there's an error
+                (errorMessage) => {
+                    // Hide typing indicator if it's still showing
+                    if (isFirstChunk) {
+                        toggleTyping(false);
+                    }
+                    finalizeStreamingMessage(errorMessage);
+                    
+                    // Add error message to conversation history
+                    conversationHistory.push({
+                        "role": "assistant",
+                        "content": errorMessage
+                    });
+
+                    // Re-enable input
+                    input.disabled = false;
+                    button.disabled = false;
+                    if (otherInput) {
+                        otherInput.disabled = false;
+                    }
+                    if (otherButton) {
+                        otherButton.disabled = false;
+                    }
+                }
+            );
         }
 
         // Event listeners
