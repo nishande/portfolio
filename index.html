@@ -2,496 +2,1038 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NISHAN DE | Software Engineer</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NISHAN DE | AI Driven Software Engineer</title>
 
-    <!-- GSAP, Particles.js, and Font Awesome -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
-            --neon-blue: #00f3ff;
-            --neon-purple: #7700ff;
-            --dark-bg: #0a0a0a;
+            --cyan-400: #22d3ee;
+            --cyan-500: #06b6d4;
+            --cyan-900: #164e63;
+            --purple-400: #c084fc;
+            --purple-500: #a855f7;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-850: #1a2332;
+            --slate-900: #0f172a;
+            --slate-950: #020617;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
-            background: var(--dark-bg);
-            color: #fff;
-            font-family: 'Consolas', monospace;
+            background-color: #050505;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        #particles-js {
+        /* Scrollbar Styling */
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background-color: var(--slate-800);
+            border-radius: 20px;
+        }
+
+        /* Background Effects */
+        .background-container {
             position: fixed;
+            inset: 0;
+            z-index: -10;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            background: #000;
         }
 
-        .container {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
+        .noise-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
+            opacity: 0.1;
         }
 
-        .glass-morphism {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            margin: 1rem;
-            opacity: 0;
-            transform: translateY(20px);
+        .grid-pattern {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, var(--slate-800) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--slate-800) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+            opacity: 0.2;
         }
 
-        .terminal {
-            background: #1a1a1a;
-            border-radius: 10px;
-            padding: 1rem;
-            margin: 2rem;
-        }
-
-        .terminal-header {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
+        .glow-cyan {
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(6, 182, 212, 0.1);
             border-radius: 50%;
+            filter: blur(120px);
         }
 
-        .red {
-            background: #ff5f56;
+        .glow-purple {
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 50%;
+            filter: blur(120px);
         }
 
-        .yellow {
-            background: #ffbd2e;
+        /* Main Container */
+        .main-container {
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 1rem;
         }
 
-        .green {
-            background: #27c93f;
+        .content-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            z-index: 10;
         }
 
-        .terminal-content {
-            font-family: 'Consolas', monospace;
-            color: #00ff00;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-        }
-
-        .skill-item {
+        /* Terminal Header */
+        .terminal-header {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 2rem;
             padding: 1rem;
-            border: 1px solid var(--neon-blue);
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.3s ease;
+            border-radius: 0.75rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--slate-700);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
         }
 
-        .skill-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px var(--neon-blue);
-        }
-
-        .typing-effect {
-            border-right: 2px solid var(--neon-blue);
-            white-space: nowrap;
-            overflow: hidden;
-            margin: 0;
-        }
-
-        .summary {
-            line-height: 1.6;
-            margin: 2rem 0;
-        }
-
-        .summary p {
-            margin: 0;
-            color: #ffffff;
-            font-size: 1.1rem;
-        }
-
-        h1 {
-            color: var(--neon-blue);
-            font-size: 2.5rem;
+        .terminal-dots {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             margin-bottom: 0.5rem;
         }
 
-        h2 {
-            color: var(--neon-purple);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+        .dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
         }
 
-        .social-links {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-            align-items: center;
-            opacity: 1;
-            /* Set initial opacity to 1 */
+        .dot-red {
+            background: #ef4444;
         }
 
-        .social-links a {
-            display: inline-block;
-            transition: all 0.3s ease;
-            opacity: 1;
-            /* Set initial opacity to 1 */
+        .dot-yellow {
+            background: #eab308;
         }
 
-        .social-links a:hover {
-            transform: translateY(-3px);
-            filter: drop-shadow(0 0 8px var(--neon-blue));
+        .dot-green {
+            background: #22c55e;
         }
 
-        .social-links img {
-            width: 40px;
-            height: 40px;
-            vertical-align: middle;
+        .terminal-content {
+            color: #9ca3af;
         }
 
-        #profile .social-links {
-            opacity: 1 !important;
+        .terminal-content .purple {
+            color: var(--purple-400);
         }
 
-        /* Chatbot Styles */
-        .chat-widget {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 350px;
-            height: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .terminal-content .blue {
+            color: #60a5fa;
+        }
+
+        .terminal-content .green {
+            color: #4ade80;
+        }
+
+        .terminal-content .gray {
+            color: #d1d5db;
+        }
+
+        .terminal-output {
+            padding-left: 1rem;
+            color: #d1d5db;
+        }
+
+        /* Grid Layout */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            height: auto;
+        }
+
+        @media (min-width: 1024px) {
+            .grid-layout {
+                grid-template-columns: 7fr 5fr;
+                min-height: 650px;
+            }
+        }
+
+        /* Profile Card */
+        .profile-card {
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.1);
+            backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-            transform: translateY(440px);
+            overflow-y: auto;
+            max-height: 800px;
         }
 
-        /* Markdown styles for chat */
-        .bot-message strong {
-            font-weight: bold;
-            color: var(--neon-blue);
+        .profile-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--cyan-400);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
         }
 
-        .bot-message em {
-            font-style: italic;
-            color: var(--neon-purple);
+        .profile-header h2 {
+            font-size: 1.25rem;
+            color: var(--purple-400);
+            font-weight: 500;
+            letter-spacing: 0.025em;
+            margin-bottom: 1.5rem;
         }
 
-        .bot-message ul {
-            padding-left: 20px;
-            margin: 5px 0;
+        @media (min-width: 768px) {
+            .profile-header h1 {
+                font-size: 3rem;
+            }
+
+            .profile-header h2 {
+                font-size: 1.5rem;
+            }
         }
 
-        .bot-message li {
-            margin: 2px 0;
+        /* Contact Info */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
         }
 
-        .bot-message h1,
-        .bot-message h2,
-        .bot-message h3 {
-            margin: 5px 0;
-            color: var(--neon-blue);
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #d1d5db;
         }
 
-        .chat-widget.expanded {
-            transform: translateY(0);
+        .contact-item i {
+            color: var(--cyan-400);
+            width: 1rem;
+        }
+
+        .contact-item a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-item a:hover {
+            color: var(--cyan-400);
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-link {
+            padding: 0.5rem;
+            background: rgba(22, 78, 99, 0.3);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--cyan-400);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: rgba(6, 182, 212, 0.2);
+            color: #a5f3fc;
+            transform: translateY(-2px);
+        }
+
+        .social-link i {
+            font-size: 1.25rem;
+        }
+
+        /* Bio */
+        .bio {
+            margin-bottom: 1.5rem;
+            color: #d1d5db;
+            line-height: 1.6;
+            font-size: 0.875rem;
+            font-weight: 300;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--purple-400);
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Education */
+        .education-item {
+            font-size: 0.875rem;
+            color: #d1d5db;
+        }
+
+        .edu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .edu-header strong {
+            color: var(--cyan-400);
+        }
+
+        .year {
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+
+        .edu-details {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .edu-info {
+            color: #d1d5db;
+        }
+
+        /* Certifications */
+        .cert-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .cert-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #d1d5db;
+            padding: 0.5rem;
+            background: rgba(22, 78, 99, 0.2);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .cert-item i {
+            color: var(--cyan-400);
+        }
+
+        /* Experience */
+        .experience-item {
+            font-size: 0.875rem;
+        }
+
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .exp-header strong {
+            color: var(--cyan-400);
+            font-size: 1rem;
+        }
+
+        .company {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .exp-projects {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .project {
+            padding: 0.75rem;
+            background: rgba(22, 78, 99, 0.1);
+            border-radius: 0.5rem;
+            border-left: 3px solid var(--cyan-400);
+        }
+
+        .project strong {
+            color: var(--purple-400);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .project ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .project li {
+            color: #d1d5db;
+            padding-left: 1rem;
+            position: relative;
+            margin-bottom: 0.25rem;
+            line-height: 1.5;
+        }
+
+        .project li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--cyan-400);
+        }
+
+        /* Tech Stack */
+        .tech-stack {
+            margin-top: 1.5rem;
+        }
+
+        .tech-stack h3 {
+            color: var(--purple-400);
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-item {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            background: var(--slate-800);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            color: #67e8f9;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            border-color: var(--cyan-400);
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.5);
+            border-radius: 0.75rem;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+        }
+
+        @media (min-width: 1024px) {
+            .chat-widget {
+                min-height: 650px;
+            }
         }
 
         .chat-header {
-            padding: 15px;
-            background: rgba(0, 243, 255, 0.1);
-            border-radius: 15px 15px 0 0;
-            cursor: pointer;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.3);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.75rem;
         }
 
-        .chat-header i {
-            color: var(--neon-blue);
+        .chat-icon {
+            padding: 0.5rem;
+            background: rgba(22, 78, 99, 0.5);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--cyan-400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        .chat-header-text h3 {
+            color: white;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        @media (min-width: 768px) {
+            .chat-header-text h3 {
+                font-size: 1rem;
+            }
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        /* Chat Messages */
         .chat-messages {
-            flex-grow: 1;
-            padding: 15px;
+            flex: 1;
             overflow-y: auto;
-            overflow-x: hidden;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 1rem;
         }
 
-        .message {
-            max-width: 80%;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 5px 0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            hyphens: auto;
-        }
-
-        .user-message {
-            background: rgba(0, 243, 255, 0.1);
-            align-self: flex-end;
-        }
-
-        .bot-message {
-            background: rgba(119, 0, 255, 0.1);
-            align-self: flex-start;
-        }
-
-        .chat-input {
-            padding: 15px;
+        .message-wrapper {
             display: flex;
-            gap: 10px;
+            width: 100%;
+        }
+
+        .message-wrapper.user {
+            justify-content: flex-end;
+        }
+
+        .message-wrapper.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            display: flex;
+            max-width: 85%;
+            gap: 0.5rem;
+        }
+
+        .message-wrapper.user .message-content {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 2rem;
+            height: 2rem;
+            min-width: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid;
+        }
+
+        .message-avatar.user {
+            background: var(--slate-700);
+            border-color: #475569;
+        }
+
+        .message-avatar.bot {
+            background: rgba(22, 78, 99, 0.4);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .message-avatar i {
+            font-size: 0.875rem;
+        }
+
+        .message-avatar.user i {
+            color: #d1d5db;
+        }
+
+        .message-avatar.bot i {
+            color: var(--cyan-400);
+        }
+
+        .message-bubble {
+            padding: 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-wrapper.user .message-bubble {
+            background: var(--slate-700);
+            color: white;
+            border-top-right-radius: 0.25rem;
+        }
+
+        .message-wrapper.bot .message-bubble {
+            background: rgba(22, 78, 99, 0.3);
+            color: #a5f3fc;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-top-left-radius: 0.25rem;
+        }
+
+        /* Markdown styles for bot messages */
+        .message-bubble strong {
+            font-weight: 700;
+            color: var(--cyan-400);
+        }
+
+        .message-bubble em {
+            font-style: italic;
+        }
+
+        .message-bubble a {
+            color: var(--cyan-400);
+            text-decoration: underline;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            justify-content: flex-start;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-content {
+            display: flex;
+            max-width: 85%;
+            gap: 0.5rem;
+        }
+
+        .typing-bubble {
+            padding: 1rem;
+            background: rgba(22, 78, 99, 0.3);
+            border-radius: 1rem;
+            border-top-left-radius: 0.25rem;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: var(--cyan-400);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0ms;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 150ms;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 300ms;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-0.5rem);
+            }
+        }
+
+        /* Chat Input */
+        .chat-input {
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.3);
+            border-top: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .chat-input-form {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .chat-input input {
-            flex-grow: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: #d1d5db;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            padding-right: 3rem;
             outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input input::placeholder {
+            color: #6b7280;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--cyan-500);
+            box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .chat-input button {
-            padding: 10px 15px;
+            position: absolute;
+            right: 0.5rem;
+            padding: 0.5rem;
+            background: var(--cyan-500);
+            color: white;
             border: none;
-            border-radius: 5px;
-            background: var(--neon-blue);
-            color: #000;
+            border-radius: 0.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .chat-input button:hover {
-            background: var(--neon-purple);
-            color: #fff;
+        .chat-input button:hover:not(:disabled) {
+            background: var(--cyan-400);
         }
 
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            background: rgba(119, 0, 255, 0.1);
-            padding: 10px;
-            border-radius: 10px;
-            color: #fff;
-            max-width: 80%;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+        .chat-input button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-input button i {
+            font-size: 1.125rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .terminal-header {
+                font-size: 0.75rem;
+            }
+
+            .profile-card {
+                padding: 1.5rem;
+                max-height: none;
+            }
+
+            .exp-header {
+                flex-direction: column;
+            }
+
+            .year {
+                margin-top: 0.25rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div id="particles-js"></div>
-
-    <!-- Add the chat widget HTML -->
-    <div class="chat-widget">
-        <div class="chat-header">
-            <i class="fas fa-robot"></i>
-            <span>Chat with Nishan's AI Assistant</span>
-        </div>
-        <div class="chat-messages">
-            <div class="message bot-message">Hi! I'm <strong>Nishan's AI assistant</strong>. Feel free to ask me
-                anything about him!</div>
-        </div>
-        <div class="typing-indicator">AI is typing...</div>
-        <div class="chat-input">
-            <input type="text" placeholder="Ask me anything...">
-            <button><i class="fas fa-paper-plane"></i></button>
-        </div>
+    <!-- Background Effects -->
+    <div class="background-container">
+        <div class="noise-overlay"></div>
+        <div class="grid-pattern"></div>
+        <div class="glow-cyan"></div>
+        <div class="glow-purple"></div>
     </div>
 
-    <div class="container">
-        <header class="terminal">
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="content-wrapper">
+            <!-- Terminal Header -->
             <div class="terminal-header">
-                <span class="dot red"></span>
-                <span class="dot yellow"></span>
-                <span class="dot green"></span>
-            </div>
-            <div class="terminal-content">
-                <div id="typing-text"></div>
-            </div>
-        </header>
-
-        <main>
-            <section id="profile" class="glass-morphism">
-                <h1>NISHAN DE</h1>
-                <h2>Software Engineer</h2>
-                <div class="social-links">
-                    <a href="https://www.linkedin.com/in/nishande" target="_blank" title="LinkedIn">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMDA3N2I1IiBkPSJNMTkgMGgtMTRjLTIuNzYxIDAtNSAyLjIzOS01IDV2MTRjMCAyLjc2MSAyLjIzOSA1IDUgNWgxNGMyLjc2MiAwIDUtMi4yMzkgNS01di0xNGMwLTIuNzYxLTIuMjM4LTUtNS01em0tMTEgMTloLTN2LTExaDN2MTF6bS0xLjUtMTIuMjY4Yy0uOTY2IDAtMS43NS0uNzktMS43NS0xLjc2NHMuNzg0LTEuNzY0IDEuNzUtMS43NjQgMS43NS43OSAxLjc1IDEuNzY0LS43ODMgMS43NjQtMS43NSAxLjc2NHptMTMuNSAxMi4yNjhoLTN2LTUuNjA0YzAtMy4zNjgtNC0zLjExMy00IDB2NS42MDRoLTN2LTExaDN2MS43NjVjMS4zOTYtMi41ODYgNy0yLjc3NyA3IDIuNDc2djYuNzU5eiIvPjwvc3ZnPg=="
-                            alt="LinkedIn" width="40" height="40">
-                    </a>
-                    <a href="https://github.com/nishande" target="_blank" title="GitHub">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMjQyOTJlIiBkPSJNMTIgLjI5N2MtNi42MyAwLTEyIDUuMzczLTEyIDEyIDAgNS4zMDMgMy40MzggOS44IDguMjA1IDExLjM4NS42LjExMy44Mi0uMjU4LjgyLS41NzcgMC0uMjg1LS4wMS0xLjA0LS4wMTUtMi4wNC0zLjMzOC43MjQtNC4wNDItMS42MS00LjA0Mi0xLjYxQzQuNDIyIDE4LjA3IDMuNjMzIDE3LjcgMy42MzMgMTcuN2MtMS4wODctLjc0NC4wODQtLjcyOS4wODQtLjcyOSAxLjIwNS4wODQgMS44MzggMS4yMzYgMS44MzggMS4yMzYgMS4wNyAxLjgzNSAyLjgwOSAxLjMwNSAzLjQ5NS45OTguMTA4LS43NzYuNDE3LTEuMzA1Ljc2LTEuNjA1LTIuNjY1LS4zLTUuNDY2LTEuMzMyLTUuNDY2LTUuOTMgMC0xLjMxLjQ2NS0yLjM4IDEuMjM1LTMuMjItLjEzNS0uMzAzLS41NC0xLjUyMy4xMDUtMy4xNzYgMCAwIDEuMDA1LS4zMjIgMy4zIDEuMjMuOTYtLjI2NyAxLjk4LS40IDMtLjQwNXMyLjA0LjEzOCAzIC40MDVjMi4yOC0xLjU1MiAzLjI4NS0xLjIzIDMuMjg1LTEuMjMuNjQ1IDEuNjUzLjI0IDIuODczLjEyIDMuMTc2Ljc2NS44NCAxLjIzIDEuOTEgMS4yMyAzLjIyIDAgNC42MS0yLjgwNSA1LjYyNS01LjQ3NSA1LjkyLjQyLjM2LjgxIDEuMDk2LjgxIDIuMjIgMCAxLjYwNi0uMDE1IDIuODk2LS4wMTUgMy4yODYgMCAuMzE1LjIxLjY5LjgyNS41N0MyMC41NjUgMjIuMDkyIDI0IDE3LjU5MiAyNCAxMi4yOTdjMC02LjYyNy01LjM3My0xMi0xMi0xMiIvPjwvc3ZnPg=="
-                            alt="GitHub" width="40" height="40">
-                    </a>
+                <div class="terminal-dots">
+                    <div class="dot dot-red"></div>
+                    <div class="dot dot-yellow"></div>
+                    <div class="dot dot-green"></div>
                 </div>
-                <div class="summary">
-                    <p style="white-space: pre-line;">
-                        Innovative software developer with expertise in Python, Flask, and .NET MVC for
-                        building robust web applications. Skilled in problem-solving and delivering efficient
-                        solutions. Experienced in applying NLP and generative AI to develop innovative tools.
-                        Proven ability to quickly learn and adapt to new technologies.
+                <div class="terminal-content">
+                    <p>
+                        <span class="purple">console</span>.<span class="blue">log</span>(<span class="green">'Hello, I
+                            am Nishan De'</span>);
                     </p>
+                    <p class="terminal-output">&gt; An AI Driven Software Engineer</p>
                 </div>
-            </section>
+            </div>
 
-            <section id="skills" class="glass-morphism">
-                <h2>Tech Stack</h2>
-                <div class="skills-grid"></div>
-            </section>
-        </main>
+            <!-- Grid Layout -->
+            <div class="grid-layout">
+                <!-- Profile Card -->
+                <div class="profile-card scrollbar-thin">
+                    <div class="profile-header">
+                        <h1>NISHAN DE</h1>
+                        <h2>AI Driven Software Engineer</h2>
+                    </div>
+
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:iamnishande@gmail.com">iamnishande@gmail.com</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Kolkata, West Bengal, India - 700102</span>
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/nishande" target="_blank" rel="noopener noreferrer"
+                            class="social-link" title="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://github.com/nishande" target="_blank" rel="noopener noreferrer"
+                            class="social-link" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://www.instagram.com/nishandey" target="_blank" rel="noopener noreferrer"
+                            class="social-link" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://www.facebook.com/iamnishandey" target="_blank" rel="noopener noreferrer"
+                            class="social-link" title="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </div>
+
+                    <div class="bio">
+                        Innovative AI Developer with 3 years of experience in designing intelligent systems, agentic
+                        applications, and generative AI solutions. Skilled in utilizing advanced frameworks, NLP, and
+                        Python to build scalable, AI-driven tools on cloud platforms like Microsoft Azure. Passionate
+                        about delivering impactful solutions and exploring creative pursuits like music-making and bug
+                        bounty hunting.
+                    </div>
+                    <!-- <div class="section">
+                        <h3 class="section-title">Experience</h3>
+                        <div class="experience-item">
+                            <div class="exp-header">
+                                <div>
+                                    <strong>Software Engineer</strong>
+                                    <div class="company">Wipro | Kolkata, India</div>
+                                </div>
+                                <span class="year">Dec 2022 – Present</span>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!-- <div class="section">
+                        <h3 class="section-title">Certifications</h3>
+                        <div class="cert-grid">
+                            <div class="cert-item">
+                                <i class="fas fa-certificate"></i>
+                                <span>Microsoft Azure Cloud Fundamentals (AZ-900)</span>
+                            </div>
+                            <div class="cert-item">
+                                <i class="fas fa-certificate"></i>
+                                <span>Power BI Data Analyst Associate (PL-300)</span>
+                            </div>
+                            <div class="cert-item">
+                                <i class="fas fa-certificate"></i>
+                                <span>GitHub Copilot (GH-300)</span>
+                            </div>
+                        </div>
+                    </div> -->
+
+
+                    <div class="tech-stack">
+                        <h3>Key Skills</h3>
+                        <div class="tech-grid" id="techGrid"></div>
+                    </div>
+                </div>
+
+                <!-- Chat Widget -->
+                <div class="chat-widget">
+                    <div class="chat-header">
+                        <div class="chat-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="chat-header-text">
+                            <h3>Chat with Nishan's AI Assistant</h3>
+                            <div class="chat-status">
+                                <span class="status-dot"></span>
+                                <span class="status-text">Online</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages scrollbar-thin" id="chatMessages">
+                        <div class="message-wrapper bot">
+                            <div class="message-content">
+                                <div class="message-avatar bot">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="message-bubble">
+                                    Hi! I'm <strong>Nishan's AI assistant</strong>. Feel free to ask me anything about
+                                    him!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="typing-content">
+                            <div class="message-avatar bot">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="typing-bubble">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input">
+                        <form class="chat-input-form" id="chatForm">
+                            <input type="text" id="chatInput" placeholder="Ask me anything..." autocomplete="off">
+                            <button type="submit" id="sendButton">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Particle.js configuration
-        particlesJS("particles-js", {
-            particles: {
-                number: { value: 80 },
-                color: { value: "#00f3ff" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5 },
-                size: { value: 3 },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: "#00f3ff",
-                    opacity: 0.4,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2
-                }
-            }
-        });
-
-        // Skills array
-        const skills = [
-            "Python", "Flask", "C#", ".NET Core MVC",
-            "REST API", "MySQL", "MongoDB", "HTML/CSS",
-            "JavaScript", "jQuery", "Git", "C++",
-            "NumPy", "Pandas", "NLTK", "Data Analysis", "Generative AI", "RAG", "LLM"
+        // Tech Stack Data
+        const techStack = [
+            "Python", "C++", "C", "C#", "HTML", "CSS", "JavaScript", "SQL", "jQuery",
+            "Generative AI", "Large Language Models", "Agentic AI", "LangChain",
+            "Prompt Engineering", "Natural Language Processing", "Information Retrieval",
+            "Data Visualization", "Chroma", "FAISS", "MySQL", "MS SQL",
+            "NumPy", "Pandas", "NLTK", "REST APIs", "Flask", ".NET MVC Core",
+            "Git", "GitHub", "GitLab", "Microsoft Azure"
         ];
 
-        // Populate skills
-        const skillsGrid = document.querySelector('.skills-grid');
-        skills.forEach(skill => {
-            const skillItem = document.createElement('div');
-            skillItem.className = 'skill-item';
-            skillItem.innerHTML = skill;
-            skillsGrid.appendChild(skillItem);
+        // Populate Tech Stack
+        const techGrid = document.getElementById('techGrid');
+        techStack.forEach(tech => {
+            const techItem = document.createElement('span');
+            techItem.className = 'tech-item';
+            techItem.textContent = tech;
+            techGrid.appendChild(techItem);
         });
 
-        // Enhanced typing effect with callback
-        const text = "console.log('Hello, I am Nishan De');\n> Software Engineer\n> Full Stack Developer";
-        const typingText = document.getElementById('typing-text');
-        let i = 0;
-
-        function typeWriter(callback) {
-            if (i < text.length) {
-                typingText.innerHTML += text.charAt(i);
-                i++;
-                setTimeout(() => typeWriter(callback), 50);
-            } else if (callback) {
-                setTimeout(callback, 500);
-            }
-        }
-
-        // Animation sequence
-        window.onload = function () {
-            // Start typing animation
-            typeWriter(() => {
-                // Animate the glass-morphism sections
-                gsap.to("#profile", {
-                    duration: 1,
-                    opacity: 1,
-                    y: 0,
-                    ease: "power4.out"
-                });
-
-                gsap.to("#skills", {
-                    duration: 1,
-                    opacity: 1,
-                    y: 0,
-                    delay: 0.3,
-                    ease: "power4.out"
-                });
-
-                // Separate animation for social links
-                gsap.from(".social-links a", {
-                    duration: 0.5,
-                    y: 20,
-                    stagger: 0.2,
-                    delay: 0.5,
-                    ease: "back.out",
-                    opacity: 0,  // Start from opacity 0
-                    clearProps: "opacity" // Clear opacity after animation
-                });
-            });
-        };
-    </script>
-
-    <!-- Chatbot Script -->
-    <script>
-        // Chat widget functionality
-        const chatWidget = document.querySelector('.chat-widget');
-        const chatHeader = document.querySelector('.chat-header');
-        const chatMessages = document.querySelector('.chat-messages');
-        const chatInput = document.querySelector('.chat-input input');
-        const chatButton = document.querySelector('.chat-input button');
-        const typingIndicator = document.querySelector('.typing-indicator');
+        // Chat Functionality
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatForm = document.getElementById('chatForm');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
 
         // API Configuration
         const A4F_API_KEY = "ddc-a4f-b4b54e4571814a8192c9cd492a15f2c2";
         const A4F_API_ENDPOINT = "https://api.a4f.co/v1/chat/completions";
 
-        // Available models stored directly in the script
+        // Available models
         const availableModels = [
             "provider-5/gpt-5-nano",
             "provider-2/gpt-5-nano"
         ];
 
-        // Function to get a random model, avoiding the last used one if possible
+        // Get random model
         function getRandomModel(lastUsedModel) {
             if (availableModels.length === 0) {
-                return "provider-1//gemini-2.0-flash"; // Default fallback
+                return "provider-1//gemini-2.0-flash";
             }
 
             if (availableModels.length === 1 || !lastUsedModel) {
                 return availableModels[Math.floor(Math.random() * availableModels.length)];
             }
 
-            // Filter out the last used model if possible
             const availableOptions = availableModels.filter(model => model !== lastUsedModel);
 
-            // If we have other options, use one of them, otherwise use any model
             if (availableOptions.length > 0) {
                 return availableOptions[Math.floor(Math.random() * availableOptions.length)];
             } else {
@@ -499,116 +1041,149 @@
             }
         }
 
-        // Toggle chat widget expansion
-        chatHeader.addEventListener('click', () => {
-            chatWidget.classList.toggle('expanded');
-        });
-
         // Context about Nishan
         const nishanContext = `
             Current Date and Time: ${(() => { const d = new Date(); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`; })()}
-            Nishan De is a Software Engineer with expertise in:
-            - Python, Flask, and .NET MVC for web applications
-            - Problem-solving and delivering efficient solutions
-            - Experience in NLP and generative AI
-            - Quick learner who adapts to new technologies
             
-            Technical skills include:
-            - Python, Flask, C#, .NET Core MVC
-            - REST API, MySQL, MongoDB, HTML/CSS
-            - JavaScript, jQuery, Git, C++
-            - NumPy, Pandas, NLTK, Data Analysis, Generative AI, RAG, LLM, Deep Learning, Machine Learning, AI, Computer Vision, Natural Language Processing
-            Works at: Wipro
-            Joined the organization on: 30th December 2022
-            Salary:  tell them it's a secret! in a very funny way.
-            Linkedin: https://www.linkedin.com/in/nishande
-            GitHub: https://github.com/nishande
-            Email: iamnishande@gmail.com
-            Instagram: https://www.instagram.com/nishandey
-            Facebook: https://www.facebook.com/iamnishandey
-            Phone: This is secret, ask me in person!
-            Address: This is secret, ask me in person!
-            Date of Birth: 10th January 2000
-            Place of Birth: Kharagpur, West Bengal, India
-            Time of Birth: 8:15 AM
-            Nationality: Indian
-            Address: Kharagpur, West Bengal, India
-            Gender: Male
-            Marital Status: Single
-            Hobbies: Coding, Bug Hunting, watching movies, exploring new technologies, exploring new places, music, playing guitar, singing
-            Favorite Food: Tengra Fish, Chicken curry
-            Favorite Color: Blue
-            Favorite Sport: Cricket
-            Favorite Series: Stranger Things, Money Heist, Dark
-            Favorite Cinematic Universe: Marvel Cinematic Universe
+            Nishan De is an AI Developer and Software Engineer with 3 years of experience at Wipro.
+            
+            Contact Information:
+            - Phone: (If asked just say to write a mail and ask him directly and provide his mail id)
+            - Email: iamnishande@gmail.com
+            - Location: Kolkata, West Bengal, India - 700102
+            - LinkedIn: https://www.linkedin.com/in/nishande
+            - GitHub: https://github.com/nishande
+            - Instagram: https://www.instagram.com/nishandey
+            - Facebook: https://www.facebook.com/iamnishandey
+            
+            Education:
+            - Bachelor of Technology (B.Tech) in Computer Science and Engineering
+              Gandhi Institute For Technological Advancement (2018-2022)
+              CGPA: 9.0
+            - 12th Science with Physics, Chemistry, Mathematics and Computer Science
+              Kendriya Vidyalaya (2017-2018)
+            - 10th Class
+              DAV Model School, IIT Kharagpur (2015-2016)
+            
+            Certifications:
+            - Microsoft Azure Cloud Fundamentals (AZ-900)
+            - Power BI Data Analyst Associate (PL-300)
+            - GitHub Copilot (GH-300)
+            
+            Professional Experience:
+            - Software Engineer at Wipro (Dec 2022 – Present)
+            - Location: Kolkata, India
+            
+            Key Projects:
+            1. Interactive Rationalisation Chatbot:
+               - Engineered agentic AI-powered chatbot for BI metadata monitoring
+               - Saved 20+ hours per week
+               - 40% decrease in redundant reports
+               - 30% efficiency boost in metadata analysis
+               - Used LangChain with Azure OpenAI GPT-4o
+               - Achieved 95% query accuracy
+            
+            2. BI Dashboard Validation Tool:
+               - AI-driven validation tool for BI migrations (Tableau to Power BI)
+               - Detected 95% of discrepancies
+               - Reduced manual analysis time by 50%
+               - Cut validation time by 40%
+               - Used NLP (NLTK), NumPy, Pandas
+            
+            3. BI Transformation Tools:
+               - Developed Cognos to Qlik Sense, BO to Looker, Qlik Sense to Power BI tools
+               - 60% automation achieved
+               - Reduced manual effort by 40%
+               - 95% accuracy in component mapping
+               - 30% workflow efficiency improvement
+            
+            Technical Skills:
+            - Languages: Python, C++, C, C#, HTML, CSS, JavaScript, SQL, jQuery
+            - AI/ML: Generative AI, Large Language Models, Agentic AI, LangChain, Prompt Engineering, NLP
+            - Data: NumPy, Pandas, NLTK, Data Visualization, Information Retrieval
+            - Databases: Vector Databases (Chroma, FAISS), MySQL, MS SQL
+            - Development: Flask, .NET MVC Core, REST APIs
+            - Cloud: Microsoft Azure
+            - Tools: Git, GitHub, GitLab
+            
+            Personal Information:
+            - Date of Birth: 10th January 2000
+            - Place of Birth: Kharagpur, West Bengal, India
+            - Nationality: Indian
+            - Gender: Male
+            - Marital Status: Single
+            - Hobbies: Coding, Bug Hunting, watching movies, exploring new technologies, music-making, playing guitar, singing
+            - Favorite Food: Tengra Fish, Chicken curry
+            - Favorite Color: Blue
+            - Favorite Sport: Cricket
+            - Favorite Series: Stranger Things, Money Heist, Dark
+            - Favorite Cinematic Universe: Marvel Cinematic Universe
         `;
 
-        // Function to add a message to the chat
+        // Add message to chat
         function addMessage(message, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `message-wrapper ${isUser ? 'user' : 'bot'}`;
 
-            // If it's a bot message, process markdown and convert URLs to clickable links
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${isUser ? 'user' : 'bot'}`;
+            avatar.innerHTML = `<i class="fas fa-${isUser ? 'user' : 'robot'}"></i>`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+
             if (!isUser) {
                 // Process markdown
                 message = processMarkdown(message);
-
-                // Regular expression to match URLs
+                // Convert URLs to links
                 const urlRegex = /(https?:\/\/[^\s]+)/g;
-                message = message.replace(urlRegex, function (url) {
-                    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #00f3ff; text-decoration: none;">${url}</a>`;
+                message = message.replace(urlRegex, url => {
+                    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
                 });
-                messageDiv.innerHTML = message;
+                bubble.innerHTML = message;
             } else {
-                messageDiv.textContent = message;
+                bubble.textContent = message;
             }
 
-            chatMessages.appendChild(messageDiv);
+            messageContent.appendChild(avatar);
+            messageContent.appendChild(bubble);
+            messageWrapper.appendChild(messageContent);
+            chatMessages.appendChild(messageWrapper);
+
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            return messageDiv;
         }
 
-        // Function to process markdown in text
+        // Process markdown
         function processMarkdown(text) {
             // Bold: **text** or __text__
             text = text.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
-
             // Italic: *text* or _text_
             text = text.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
-
-            // Lists: - item or * item
-            text = text.replace(/^([-*]) (.*?)$/gm, '<li>$2</li>');
-            text = text.replace(/<li>(.*?)<\/li>(\n<li>.*?<\/li>)+/g, '<ul>$&</ul>');
-
-            // Headers: # Header
-            text = text.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
-            text = text.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
-            text = text.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
-
             // Line breaks
             text = text.replace(/\n/g, '<br>');
-
             return text;
         }
 
-        // Function to show/hide typing indicator
-        function toggleTyping(show, retryCount = 0) {
-            typingIndicator.style.display = show ? 'block' : 'none';
-            if (show && retryCount > 0) {
-                typingIndicator.textContent = `AI is typing... (Retry ${retryCount}/5)`;
+        // Toggle typing indicator
+        function toggleTyping(show) {
+            if (show) {
+                typingIndicator.classList.add('active');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             } else {
-                typingIndicator.textContent = 'AI is typing...';
+                typingIndicator.classList.remove('active');
             }
         }
 
-        // Function to get AI response with retry
+        // Get AI response
         async function getAIResponse(userMessage, retryCount = 0, lastUsedModel = null) {
             const headers = {
                 "Authorization": `Bearer ${A4F_API_KEY}`,
                 "Content-Type": "application/json"
             };
 
-            // Select a model, different from the last one if retrying
             const selectedModel = getRandomModel(lastUsedModel);
             console.log(`Using model (attempt ${retryCount + 1}): ${selectedModel}`);
 
@@ -620,12 +1195,12 @@
                         "content": `You are Nishan De's AI assistant. Use this context about him: ${nishanContext}
                         Keep responses concise and friendly. Only answer questions about Nishan based on the provided context.
                         If asked about something not in the context, politely say you don't have that information.
-                        Always ensure your responses are well-formatted and readable in the chat interface.
+                        Always ensure your responses are well-formatted and readable in the chat interface. Don't end the response with any question. Don't use the word "provided context". Always show the positive side of Nishan, and avoid the negatives.
+                        Do not provide career advice, "next steps", "practical steps", or suggestions for resume improvements.
+                        
                         Use markdown formatting in your responses:
                         - Use **bold** for emphasis and important information
-                        - Use *italic* for secondary emphasis
-                        - Use proper lists with - or * for bullet points
-                        - Use # for headers when organizing information`
+                        - Use *italic* for secondary emphasis`
                     },
                     {
                         "role": "user",
@@ -644,27 +1219,16 @@
                 const data = await response.json();
                 const responseText = data.choices[0].message.content;
 
-                // Check if response indicates an error
-                if (responseText === "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!"
-                    || !responseText) {
-
-                    // If we haven't reached max retries, try again with a different model
-                    if (retryCount < 5) {
-                        toggleTyping(true, retryCount + 1);
-                        // Wait a moment before retrying
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        return getAIResponse(userMessage, retryCount + 1, selectedModel);
-                    }
+                if (!responseText && retryCount < 5) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return getAIResponse(userMessage, retryCount + 1, selectedModel);
                 }
 
-                return responseText;
+                return responseText || "I apologize, but I'm having trouble connecting to my brain right now. Please try again later!";
             } catch (error) {
                 console.error('Error:', error);
 
-                // If we haven't reached max retries, try again with a different model
                 if (retryCount < 5) {
-                    toggleTyping(true, retryCount + 1);
-                    // Wait a moment before retrying
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     return getAIResponse(userMessage, retryCount + 1, selectedModel);
                 }
@@ -674,9 +1238,15 @@
         }
 
         // Handle send message
-        async function handleSendMessage() {
+        async function handleSendMessage(e) {
+            e.preventDefault();
+
             const message = chatInput.value.trim();
             if (!message) return;
+
+            // Disable input
+            chatInput.disabled = true;
+            sendButton.disabled = true;
 
             // Add user message
             addMessage(message, true);
@@ -689,20 +1259,15 @@
             const response = await getAIResponse(message);
             toggleTyping(false);
             addMessage(response);
+
+            // Re-enable input
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            chatInput.focus();
         }
 
         // Event listeners
-        chatButton.addEventListener('click', handleSendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSendMessage();
-            }
-        });
-
-        // Expand chat widget when clicking on input
-        chatInput.addEventListener('focus', () => {
-            chatWidget.classList.add('expanded');
-        });
+        chatForm.addEventListener('submit', handleSendMessage);
     </script>
 </body>
 
