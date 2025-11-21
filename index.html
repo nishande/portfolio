@@ -503,6 +503,141 @@
             }
         }
 
+        /* Mobile Chat Widget - Hidden by default in grid */
+        @media (max-width: 1023px) {
+            .grid-layout .chat-widget {
+                display: none;
+            }
+        }
+
+        /* Mobile Chat Overlay */
+        .chat-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .chat-overlay.active {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .chat-overlay .chat-widget {
+            width: 100%;
+            height: 85vh;
+            max-height: 600px;
+            margin: 0;
+            border-radius: 1rem 1rem 0 0;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Floating Chat Bubble */
+        .chat-bubble {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 3.5rem;
+            height: 3.5rem;
+            background: var(--cyan-500);
+            border-radius: 50%;
+            border: 2px solid rgba(6, 182, 212, 0.5);
+            box-shadow: 
+                0 0 20px rgba(6, 182, 212, 0.6),
+                0 0 40px rgba(6, 182, 212, 0.4),
+                0 0 60px rgba(6, 182, 212, 0.2);
+            cursor: pointer;
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 20px rgba(6, 182, 212, 0.6),
+                    0 0 40px rgba(6, 182, 212, 0.4),
+                    0 0 60px rgba(6, 182, 212, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 0 30px rgba(6, 182, 212, 0.8),
+                    0 0 60px rgba(6, 182, 212, 0.6),
+                    0 0 90px rgba(6, 182, 212, 0.4);
+            }
+        }
+
+        .chat-bubble:hover {
+            transform: scale(1.1);
+            background: var(--cyan-400);
+        }
+
+        .chat-bubble:active {
+            transform: scale(0.95);
+        }
+
+        .chat-bubble i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 1023px) {
+            .chat-bubble {
+                display: flex;
+            }
+        }
+
+        /* Close button for mobile chat */
+        .chat-close-btn {
+            display: none;
+        }
+
+        @media (max-width: 1023px) {
+            .chat-close-btn {
+                display: flex;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                width: 2rem;
+                height: 2rem;
+                background: rgba(239, 68, 68, 0.2);
+                border: 1px solid rgba(239, 68, 68, 0.5);
+                border-radius: 50%;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: #ef4444;
+                transition: all 0.3s ease;
+                z-index: 1001;
+            }
+
+            .chat-close-btn:hover {
+                background: rgba(239, 68, 68, 0.3);
+                transform: scale(1.1);
+            }
+
+            .chat-overlay .chat-widget {
+                position: relative;
+            }
+        }
+
         .chat-header {
             padding: 1rem;
             background: rgba(30, 41, 59, 0.5);
@@ -985,6 +1120,68 @@
         </div>
     </div>
 
+    <!-- Mobile Chat Overlay -->
+    <div class="chat-overlay" id="chatOverlay">
+        <div class="chat-widget">
+            <button class="chat-close-btn" id="chatCloseBtn" aria-label="Close chat">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="chat-header">
+                <div class="chat-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chat-header-text">
+                    <h3>Chat with Nishan's AI Assistant</h3>
+                    <div class="chat-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Online</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-messages scrollbar-thin" id="chatMessagesMobile">
+                <div class="message-wrapper bot">
+                    <div class="message-content">
+                        <div class="message-avatar bot">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-bubble">
+                            Hi! I'm <strong>Nishan's AI assistant</strong>. Feel free to ask me anything about
+                            him!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicatorMobile">
+                <div class="typing-content">
+                    <div class="message-avatar bot">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-bubble">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <form class="chat-input-form" id="chatFormMobile">
+                    <input type="text" id="chatInputMobile" placeholder="Ask me anything..." autocomplete="off">
+                    <button type="submit" id="sendButtonMobile">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Bubble (Mobile Only) -->
+    <div class="chat-bubble" id="chatBubble" aria-label="Open chat">
+        <i class="fas fa-comments"></i>
+    </div>
+
     <script>
         // Tech Stack Data
         const techStack = [
@@ -1011,6 +1208,93 @@
         const chatForm = document.getElementById('chatForm');
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
+
+        // Mobile Chat Elements
+        const chatBubble = document.getElementById('chatBubble');
+        const chatOverlay = document.getElementById('chatOverlay');
+        const chatCloseBtn = document.getElementById('chatCloseBtn');
+        const chatMessagesMobile = document.getElementById('chatMessagesMobile');
+        const chatInputMobile = document.getElementById('chatInputMobile');
+        const chatFormMobile = document.getElementById('chatFormMobile');
+        const sendButtonMobile = document.getElementById('sendButtonMobile');
+        const typingIndicatorMobile = document.getElementById('typingIndicatorMobile');
+
+        // Check if we're on mobile
+        function isMobileView() {
+            return window.innerWidth <= 1023;
+        }
+        
+        // Get the active chat elements based on screen size
+        function getActiveChatElements() {
+            if (isMobileView() && chatOverlay && chatOverlay.classList.contains('active')) {
+                return {
+                    messages: chatMessagesMobile,
+                    input: chatInputMobile,
+                    form: chatFormMobile,
+                    button: sendButtonMobile,
+                    typing: typingIndicatorMobile
+                };
+            } else {
+                return {
+                    messages: chatMessages,
+                    input: chatInput,
+                    form: chatForm,
+                    button: sendButton,
+                    typing: typingIndicator
+                };
+            }
+        }
+
+        // Mobile chat bubble click handler
+        if (chatBubble) {
+            chatBubble.addEventListener('click', () => {
+                chatOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                // Focus input when opened
+                setTimeout(() => {
+                    chatInputMobile.focus();
+                }, 300);
+            });
+        }
+
+        // Close mobile chat
+        if (chatCloseBtn) {
+            chatCloseBtn.addEventListener('click', () => {
+                chatOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Close mobile chat when clicking overlay background
+        if (chatOverlay) {
+            chatOverlay.addEventListener('click', (e) => {
+                if (e.target === chatOverlay) {
+                    chatOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Close mobile chat with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && chatOverlay && chatOverlay.classList.contains('active')) {
+                chatOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                // If switching to desktop while mobile chat is open, close it
+                if (!isMobileView() && chatOverlay && chatOverlay.classList.contains('active')) {
+                    chatOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }, 250);
+        });
 
         // Conversation History - stores up to 6 messages (user + assistant pairs)
         let conversationHistory = [];
@@ -1123,8 +1407,8 @@
             - Favorite Cinematic Universe: Marvel Cinematic Universe
         `;
 
-        // Add message to chat
-        function addMessage(message, isUser = false) {
+        // Helper function to create a message element
+        function createMessageElement(message, isUser = false) {
             const messageWrapper = document.createElement('div');
             messageWrapper.className = `message-wrapper ${isUser ? 'user' : 'bot'}`;
 
@@ -1140,13 +1424,13 @@
 
             if (!isUser) {
                 // Process markdown
-                message = processMarkdown(message);
+                const processedMessage = processMarkdown(message);
                 // Convert URLs to links
                 const urlRegex = /(https?:\/\/[^\s]+)/g;
-                message = message.replace(urlRegex, url => {
+                const finalMessage = processedMessage.replace(urlRegex, url => {
                     return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
                 });
-                bubble.innerHTML = message;
+                bubble.innerHTML = finalMessage;
             } else {
                 bubble.textContent = message;
             }
@@ -1154,9 +1438,26 @@
             messageContent.appendChild(avatar);
             messageContent.appendChild(bubble);
             messageWrapper.appendChild(messageContent);
-            chatMessages.appendChild(messageWrapper);
+            
+            return messageWrapper;
+        }
 
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        // Add message to chat (works for both desktop and mobile)
+        function addMessage(message, isUser = false) {
+            const activeElements = getActiveChatElements();
+            const targetMessages = activeElements.messages;
+
+            const messageWrapper = createMessageElement(message, isUser);
+            targetMessages.appendChild(messageWrapper);
+            targetMessages.scrollTop = targetMessages.scrollHeight;
+
+            // Also add to the other chat if it exists (for syncing)
+            const otherMessages = targetMessages === chatMessages ? chatMessagesMobile : chatMessages;
+            if (otherMessages && otherMessages.parentElement) {
+                const otherMessageWrapper = createMessageElement(message, isUser);
+                otherMessages.appendChild(otherMessageWrapper);
+                otherMessages.scrollTop = otherMessages.scrollHeight;
+            }
         }
 
         // Process markdown
@@ -1172,11 +1473,25 @@
 
         // Toggle typing indicator
         function toggleTyping(show) {
+            const activeElements = getActiveChatElements();
+            const targetTyping = activeElements.typing;
+            const targetMessages = activeElements.messages;
+
             if (show) {
-                typingIndicator.classList.add('active');
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                targetTyping.classList.add('active');
+                targetMessages.scrollTop = targetMessages.scrollHeight;
+                
+                // Also show in the other chat if it exists
+                const otherTyping = targetTyping === typingIndicator ? typingIndicatorMobile : typingIndicator;
+                if (otherTyping && otherTyping.parentElement) {
+                    otherTyping.classList.add('active');
+                }
             } else {
-                typingIndicator.classList.remove('active');
+                targetTyping.classList.remove('active');
+                const otherTyping = targetTyping === typingIndicator ? typingIndicatorMobile : typingIndicator;
+                if (otherTyping) {
+                    otherTyping.classList.remove('active');
+                }
             }
         }
 
@@ -1252,16 +1567,33 @@
         async function handleSendMessage(e) {
             e.preventDefault();
 
-            const message = chatInput.value.trim();
+            const activeElements = getActiveChatElements();
+            const input = activeElements.input;
+            const button = activeElements.button;
+
+            const message = input.value.trim();
             if (!message) return;
 
             // Disable input
-            chatInput.disabled = true;
-            sendButton.disabled = true;
+            input.disabled = true;
+            button.disabled = true;
+            
+            // Also disable the other input if it exists
+            const otherInput = input === chatInput ? chatInputMobile : chatInput;
+            const otherButton = button === sendButton ? sendButtonMobile : sendButton;
+            if (otherInput) {
+                otherInput.disabled = true;
+            }
+            if (otherButton) {
+                otherButton.disabled = true;
+            }
 
             // Add user message to UI
             addMessage(message, true);
-            chatInput.value = '';
+            input.value = '';
+            if (otherInput) {
+                otherInput.value = '';
+            }
 
             // Add user message to conversation history
             conversationHistory.push({
@@ -1289,13 +1621,22 @@
             }
 
             // Re-enable input
-            chatInput.disabled = false;
-            sendButton.disabled = false;
-            chatInput.focus();
+            input.disabled = false;
+            button.disabled = false;
+            if (otherInput) {
+                otherInput.disabled = false;
+            }
+            if (otherButton) {
+                otherButton.disabled = false;
+            }
+            input.focus();
         }
 
         // Event listeners
         chatForm.addEventListener('submit', handleSendMessage);
+        if (chatFormMobile) {
+            chatFormMobile.addEventListener('submit', handleSendMessage);
+        }
     </script>
 </body>
 
