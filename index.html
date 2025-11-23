@@ -355,6 +355,16 @@
             50% { opacity: 0; }
         }
 
+        /* Reduce motion on mobile / reduced-motion preference */
+        @media (max-width: 768px), (prefers-reduced-motion: reduce) {
+            .signal-bars span,
+            .status-dot,
+            .chat-bubble,
+            .cursor {
+                animation: none !important;
+            }
+        }
+
         /* Grid Layout */
         .grid-layout {
             display: grid;
@@ -1544,6 +1554,7 @@
         const consoleCursorEl = document.getElementById('consoleCursor');
         const gridLayout = document.getElementById('gridLayout');
         const terminalHeader = document.querySelector('.terminal-header');
+        const isLowMotion = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         document.body.classList.add('intro-active');
         terminalHeader.classList.add('intro-center');
@@ -1577,6 +1588,8 @@
 
             consoleOutputEl.textContent = '';
             gridLayout.classList.add('is-hidden');
+            terminalHeader.classList.add('intro-center');
+            document.body.classList.add('intro-active');
 
             for (let i = 0; i < lines.length; i++) {
                 await typeText(consoleLineEl, lines[i], 32, i !== 0);
